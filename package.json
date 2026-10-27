@@ -1,0 +1,26 @@
+{
+  "name": "trustvault",
+  "version": "1.0.0",
+  "description": "TrustVault — Secure Document Sharing with a Cryptographic Evidentiary Audit Trail (RISE Challenge)",
+  "private": true,
+  "scripts": {
+    "setup": "npm run seed && npm run build:frontend",
+    "seed": "node backend/node_modules/tsx/dist/cli.mjs backend/src/db/seed.ts",
+    "test": "node backend/node_modules/vitest/vitest.mjs run --root backend",
+    "build:frontend": "node frontend/node_modules/vite/bin/vite.js build --config frontend/vite.config.ts",
+    "start": "node backend/node_modules/tsx/dist/cli.mjs backend/src/server.ts",
+    "dev:backend": "node backend/node_modules/tsx/dist/cli.mjs watch backend/src/server.ts",
+    "dev:frontend": "node frontend/node_modules/vite/bin/vite.js --config frontend/vite.config.ts"
+  },
+  "keywords": [
+    "zero-trust",
+    "audit-trail",
+    "cryptography",
+    "sha-256",
+    "aes-256-gcm",
+    "security",
+    "instant-revocation"
+  ],
+  "author": "TrustVault Engineering Team",
+  "license": "Apache-2.0"
+}
