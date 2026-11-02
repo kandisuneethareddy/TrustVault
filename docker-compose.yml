@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  trustvault:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trustvault-platform
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - NODE_ENV=production
+      - JWT_SECRET=trustvault-super-secret-master-signing-key-32bytes-min!
+      - STORAGE_ENCRYPTION_KEY=trustvault_aes_256_master_key_12345678
+    volumes:
+      - trustvault-data:/app/backend/vault_storage
+      - trustvault-db:/app/backend
+    restart: unless-stopped
+
+volumes:
+  trustvault-data:
+  trustvault-db:
