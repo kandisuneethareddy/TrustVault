@@ -8,14 +8,24 @@ import {
   X,
   FileText,
 } from '../components/icons';
-import { DocumentClassification } from '../types';
+import { DocumentClassification, User } from '../types';
+import { api } from '../services/api';
 
 interface UploadPageProps {
-  onUpload: (formData: FormData) => Promise<void>;
-  onCancel: () => void;
+  currentUser?: User | null;
+  onNavigate?: (page: string, params?: any) => void;
+  onUploadSuccess?: () => void;
+  onUpload?: (formData: FormData) => Promise<void>;
+  onCancel?: () => void;
 }
 
-export const UploadPage: React.FC<UploadPageProps> = ({ onUpload, onCancel }) => {
+export const UploadPage: React.FC<UploadPageProps> = ({
+  currentUser,
+  onNavigate,
+  onUploadSuccess,
+  onUpload,
+  onCancel,
+}) => {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -25,6 +35,11 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onUpload, onCancel }) =>
   const [error, setError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCancelAction = () => {
+    if (onCancel) onCancel();
+    else if (onNavigate) onNavigate('documents');
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -59,13 +74,21 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onUpload, onCancel }) =>
       formData.append('category', category.trim());
       formData.append('classification', classification);
 
-      await onUpload(formData);
+      if (onUpload) {
+        await onUpload(formData);
+      } else {
+        await api.uploadDocument(formData);
+      }
+
+      if (onUploadSuccess) onUploadSuccess();
+      if (onNavigate) onNavigate('documents');
     } catch (err: any) {
       setError(err.message || 'Upload failed');
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -82,7 +105,7 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onUpload, onCancel }) =>
           </p>
         </div>
         <button
-          onClick={onCancel}
+          onClick={handleCancelAction}
           className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs transition cursor-pointer"
         >
           Cancel

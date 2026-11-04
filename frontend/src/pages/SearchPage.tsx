@@ -3,15 +3,17 @@ import { Search, FileText, Lock, Eye, Download, ShieldCheck, Filter } from '../c
 import { DocumentClassification, DocumentItem, User } from '../types';
 
 interface SearchPageProps {
-  documents: DocumentItem[];
-  currentUser: User;
-  onPreview: (doc: DocumentItem) => void;
+  documents?: DocumentItem[];
+  currentUser?: User | null;
+  onNavigate?: (page: string, params?: any) => void;
+  onPreview?: (doc: DocumentItem) => void;
   onDownload: (doc: DocumentItem) => void;
 }
 
 export const SearchPage: React.FC<SearchPageProps> = ({
-  documents,
+  documents = [],
   currentUser,
+  onNavigate,
   onPreview,
   onDownload,
 }) => {
@@ -21,7 +23,8 @@ export const SearchPage: React.FC<SearchPageProps> = ({
 
   const categories = ['ALL', ...Array.from(new Set(documents.map(d => d.category)))];
 
-  const filteredDocs = documents.filter(doc => {
+  const filteredDocs = (documents || []).filter(doc => {
+
     const matchesQuery =
       doc.title.toLowerCase().includes(query.toLowerCase()) ||
       doc.description.toLowerCase().includes(query.toLowerCase()) ||
@@ -139,7 +142,11 @@ export const SearchPage: React.FC<SearchPageProps> = ({
 
               <div className="flex items-center gap-2 self-end sm:self-center">
                 <button
-                  onClick={() => onPreview(doc)}
+                  onClick={() =>
+                    onPreview
+                      ? onPreview(doc)
+                      : onNavigate && onNavigate('document-details', { documentId: doc.id })
+                  }
                   className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 border border-slate-200 font-semibold text-xs transition cursor-pointer flex items-center gap-1.5"
                 >
                   <Eye className="h-3.5 w-3.5" />

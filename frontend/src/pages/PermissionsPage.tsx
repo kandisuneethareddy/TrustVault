@@ -15,21 +15,28 @@ import { DocumentItem, PermissionGrant, User } from '../types';
 import { api } from '../services/api';
 
 interface PermissionsPageProps {
-  documents: DocumentItem[];
-  currentUser: User;
+  documents?: DocumentItem[];
+  currentUser?: User | null;
   selectedDocId?: string;
+  initialDocumentId?: string;
+  onNavigate?: (page: string, params?: any) => void;
 }
 
 export const PermissionsPage: React.FC<PermissionsPageProps> = ({
-  documents,
+  documents = [],
   currentUser,
   selectedDocId,
+  initialDocumentId,
+  onNavigate,
 }) => {
   // Only documents the user owns (or can manage)
-  const manageableDocs = documents.filter(d => d.isOwner || currentUser.role === 'admin');
+  const manageableDocs = (documents || []).filter(
+    d => d.isOwner || (currentUser && currentUser.role === 'admin')
+  );
 
+  const startDocId = initialDocumentId || selectedDocId;
   const [activeDocId, setActiveDocId] = useState<string>(
-    selectedDocId || (manageableDocs.length > 0 ? manageableDocs[0].id : '')
+    startDocId || (manageableDocs.length > 0 ? manageableDocs[0].id : '')
   );
   const [permissions, setPermissions] = useState<PermissionGrant[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -51,8 +58,9 @@ export const PermissionsPage: React.FC<PermissionsPageProps> = ({
         api.listUsers(),
       ]);
       setPermissions(permsRes.permissions);
-      setAllUsers(usersRes.users.filter(u => u.id !== currentUser.id && u.id !== activeDoc?.ownerId));
+      setAllUsers(usersRes.users.filter(u => u.id !== currentUser?.id && u.id !== activeDoc?.ownerId));
     } catch (err: any) {
+
       setStatusMessage({ text: err.message || 'Failed to load permissions', type: 'error' });
     } finally {
       setIsLoading(false);

@@ -20,7 +20,7 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { ThreatsGuidePage } from './pages/ThreatsGuidePage';
 import { ProfilePage } from './pages/ProfilePage';
 
-import { DocumentItem, User } from './types';
+import { DocumentItem, User, AuditLog, AdminStats } from './types';
 import { api } from './services/api';
 
 export type PageId =
@@ -44,10 +44,13 @@ export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageId>('dashboard');
   const [pageParams, setPageParams] = useState<any>({});
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
+  const [recentLogs, setRecentLogs] = useState<AuditLog[]>([]);
+  const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
   const [ledgerVerified, setLedgerVerified] = useState(true);
   const [refusedCount, setRefusedCount] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+
 
   // Modals (Preview & AI Advisory)
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
@@ -95,12 +98,14 @@ export const App: React.FC = () => {
 
   const checkTelemetry = async () => {
     try {
-      const [verifyRes, refusedRes] = await Promise.all([
+      const [verifyRes, refusedRes, logsRes] = await Promise.all([
         api.verifyLedger(),
         api.queryAuditLogs({ status: 'REFUSED', limit: 1 }),
+        api.queryAuditLogs({ limit: 10 }),
       ]);
       setLedgerVerified(verifyRes.verification.isValid);
       setRefusedCount(refusedRes.total);
+      setRecentLogs(logsRes.logs || []);
     } catch (err) {
       // Telemetry might be limited for viewers
     }
@@ -252,7 +257,11 @@ export const App: React.FC = () => {
             <DashboardPage
               currentUser={currentUser}
               documents={documents}
+              adminStats={adminStats}
+              recentLogs={recentLogs}
               onNavigate={handleNavigate}
+              onPreviewDoc={doc => setPreviewDoc(doc)}
+              onDownloadDoc={handleDownload}
             />
           )}
 
@@ -286,6 +295,7 @@ export const App: React.FC = () => {
           {currentPage === 'document-details' && (
             <DocumentDetailsPage
               documentId={pageParams.documentId}
+              documents={documents}
               currentUser={currentUser}
               onNavigate={handleNavigate}
               onDownload={handleDownload}
@@ -308,6 +318,7 @@ export const App: React.FC = () => {
               documents={documents}
               currentUser={currentUser}
               onNavigate={handleNavigate}
+              onPreview={doc => setPreviewDoc(doc)}
               onDownload={handleDownload}
             />
           )}
