@@ -30,20 +30,17 @@ Every enterprise shares confidential documents: salary matrices with executives,
 
 ---
 
-## 3. Demo Credentials (One Account of Each Role)
+## 3. Account Roles & Security Model
 
-The platform comes pre-seeded with realistic enterprise documents and identities:
+TrustVault enforces strict three-tier role-based access control (RBAC) and document-level authorization:
 
-| Role | Name | Email | Password | Department | Primary Function |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Administrator** | Arthur Vance | `admin@trustvault.corp` | `AdminPassword123!` | Executive Compliance | Audits access, inspects cryptographic proofs & telemetry, manages sessions. *(Cannot read private document contents without owner grant).* |
-| **Document Owner** | Alice Chen | `alice@trustvault.corp` | `AlicePassword123!` | Finance & HR | Controls salary & customer contracts; grants and revokes permissions; reviews AI advisories. |
-| **Document Owner** | Bob Martinez | `bob@trustvault.corp` | `BobPassword123!` | Engineering & R&D | Owns Project Titan specifications. Compartmentalized from Alice's financial records. |
-| **Viewer (Internal)** | Charlie Davis | `charlie@trustvault.corp` | `CharliePassword123!` | Legal Counsel | Holds `READ` grant to Salary Matrix and `EDIT` to Snovasys Agreement. Cannot delete or grant to others. |
-| **Viewer (General)** | Dave Wilson | `dave@trustvault.corp` | `DavePassword123!` | Operations | Holds `READ` grant to Regulatory Audit Findings. |
-| **External Attacker** | Eve Adams | `eve@untrusted.org` | `EvePassword123!` | External Untrusted | Holds zero document grants. Tests perimeter breach detection and access refusal logging. |
+| Role | Responsibility | Access Privileges |
+| :--- | :--- | :--- |
+| **Administrator** | Executive Compliance & System Audits | Audits system activities, inspects cryptographic proofs & telemetry, manages user accounts. *(Strict Dual-Control: Administrators cannot read confidential document contents without explicit owner grants).* |
+| **Document Owner** | Document Custody & Revocation | Full custody over uploaded documents; grants named READ or EDIT access, revokes permissions immediately in 0ms, reviews AI security advisories. |
+| **Viewer** | Confidential Document Recipient | Holds strict READ access to documents explicitly shared with them. Cannot edit, share with third parties, or delete documents. |
 
-> **Tip for Evaluators:** The web UI features an interactive **Judge Evaluation Persona Switcher** in the top navigation bar. You can switch between Admin, Alice, Bob, Charlie, and Eve with a single click without re-typing passwords!
+> **Security Note:** New users can securely register their own corporate account directly via the **Register** page. User accounts are isolated so that each user only sees their own documents, notifications, and explicitly shared files.
 
 ---
 
@@ -169,7 +166,7 @@ flowchart TD
 - Instant access revocation with zero staleness window.
 - Global user session invalidation via `token_version`.
 - Human-in-the-loop AI risk advisor.
-- Executive web UI with persona switching, real-time perimeter surveillance, and in-browser safe decrypted previews.
+- Modern corporate web UI with privacy-isolated user accounts, real-time perimeter surveillance, and in-browser safe decrypted previews.
 
 ### What We Deliberately Did Not Build (and Why):
 - **Complex Folder Tree Inheritance:** Folder inheritance is the #1 cause of permission leaks in enterprises ("Someone is given access to a folder so they can see one file, and they can now see forty"). We chose explicit per-document grants.
