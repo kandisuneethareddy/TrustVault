@@ -64,9 +64,7 @@ export const App: React.FC = () => {
         .getMe()
         .then(res => {
           setCurrentUser(res.user);
-          loadDocuments();
-          checkTelemetry();
-          loadNotificationCount();
+          Promise.all([loadDocuments(), checkTelemetry(), loadNotificationCount()]);
         })
         .catch(() => {
           handleSwitchPersona('alice@trustvault.corp');
@@ -97,10 +95,11 @@ export const App: React.FC = () => {
 
   const checkTelemetry = async () => {
     try {
-      const verifyRes = await api.verifyLedger();
+      const [verifyRes, refusedRes] = await Promise.all([
+        api.verifyLedger(),
+        api.queryAuditLogs({ status: 'REFUSED', limit: 1 }),
+      ]);
       setLedgerVerified(verifyRes.verification.isValid);
-
-      const refusedRes = await api.queryAuditLogs({ status: 'REFUSED', limit: 1 });
       setRefusedCount(refusedRes.total);
     } catch (err) {
       // Telemetry might be limited for viewers
@@ -121,11 +120,8 @@ export const App: React.FC = () => {
     try {
       const res = await api.demoSwitch(email);
       setCurrentUser(res.user);
-      await loadDocuments();
-      await checkTelemetry();
-      await loadNotificationCount();
-      // Ensure we go to dashboard when switching persona
       setCurrentPage('dashboard');
+      Promise.all([loadDocuments(), checkTelemetry(), loadNotificationCount()]);
     } catch (err: any) {
       alert(`Failed to switch persona: ${err.message}`);
     }

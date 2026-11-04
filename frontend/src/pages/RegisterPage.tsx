@@ -56,7 +56,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-sky-50/20 to-pink-50/20 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      
+
       {/* Top Brand Link */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <button
@@ -78,7 +78,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
         <div className="bg-white py-8 px-6 shadow-xl shadow-slate-200/50 rounded-3xl border border-slate-200/80 space-y-6">
-          
+
           {error && (
             <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />

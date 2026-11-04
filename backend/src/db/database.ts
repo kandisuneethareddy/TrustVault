@@ -12,6 +12,7 @@ export class SQLiteAdapter {
   private db: SqlJsDatabase;
   private dbPath?: string;
   private inTransaction: boolean = false;
+  private saveTimeout: NodeJS.Timeout | null = null;
 
   constructor(db: SqlJsDatabase, dbPath?: string) {
     this.db = db;
@@ -20,11 +21,33 @@ export class SQLiteAdapter {
 
   public saveToDisk(): void {
     if (this.dbPath && !this.inTransaction) {
+      if (this.saveTimeout) return;
+      this.saveTimeout = setTimeout(() => {
+        try {
+          const data = this.db.export();
+          fs.writeFile(this.dbPath!, Buffer.from(data), (err) => {
+            if (err) console.error('Failed to write database to disk:', err);
+          });
+        } catch (err) {
+          console.error('Failed to persist database to disk:', err);
+        } finally {
+          this.saveTimeout = null;
+        }
+      }, 50);
+    }
+  }
+
+  public flushSync(): void {
+    if (this.dbPath) {
+      if (this.saveTimeout) {
+        clearTimeout(this.saveTimeout);
+        this.saveTimeout = null;
+      }
       try {
         const data = this.db.export();
         fs.writeFileSync(this.dbPath, Buffer.from(data));
       } catch (err) {
-        console.error('Failed to persist database to disk:', err);
+        console.error('Failed to sync database to disk:', err);
       }
     }
   }
@@ -59,6 +82,7 @@ export class SQLiteAdapter {
       }
     };
   }
+
 
   public prepare(sql: string) {
     const adapter = this;
@@ -129,7 +153,7 @@ export class SQLiteAdapter {
   }
 
   public close(): void {
-    this.saveToDisk();
+    this.flushSync();
     this.db.close();
   }
 }
