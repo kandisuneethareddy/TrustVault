@@ -51,7 +51,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   // Filter metrics based on role
   const myOwnedDocs = (documents || []).filter(d => d.isOwner);
-  const sharedWithMeDocs = (documents || []).filter(d => !d.isOwner && d.accessLevel !== 'NONE');
+  const sharedWithMeDocs = (documents || []).filter(d => !d.isOwner);
 
   return (
     <div className="space-y-6">

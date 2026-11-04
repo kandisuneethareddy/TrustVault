@@ -14,7 +14,8 @@ router.get('/', authenticateToken, (req: Request, res: Response): void => {
 // POST /api/notifications/:id/read - Mark notification as read
 router.post('/:id/read', authenticateToken, (req: Request, res: Response): void => {
   const user = req.user!;
-  const success = NotificationService.markAsRead(req.params.id, user.id);
+  const notifId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const success = NotificationService.markAsRead(notifId, user.id);
   res.json({ success });
 });
 

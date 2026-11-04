@@ -12,8 +12,9 @@ function getClientIp(req: Request): string {
 router.post('/analyze/:documentId', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user!;
+    const docId = Array.isArray(req.params.documentId) ? req.params.documentId[0] : req.params.documentId;
     const result = await AiPolicyService.analyzeDocument({
-      documentId: req.params.documentId,
+      documentId: docId,
       userId: user.id,
       userEmail: user.email,
       userRole: user.role,

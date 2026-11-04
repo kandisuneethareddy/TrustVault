@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { AuthService } from '../services/AuthService';
 import { getDatabase } from '../db/database';
@@ -111,7 +112,6 @@ router.post('/change-password', authenticateToken, async (req: Request, res: Res
       return;
     }
 
-    const bcrypt = await import('bcrypt');
     const valid = await bcrypt.compare(currentPassword, userRow.password_hash);
     if (!valid) {
       res.status(400).json({ error: 'Current password is incorrect' });

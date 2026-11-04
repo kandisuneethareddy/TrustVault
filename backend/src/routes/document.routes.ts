@@ -86,8 +86,9 @@ router.post('/', authenticateToken, upload.single('file'), async (req: Request, 
 router.get('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user!;
+    const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const doc = await DocumentService.getDocument({
-      documentId: req.params.id,
+      documentId: docId,
       userId: user.id,
       userEmail: user.email,
       userRole: user.role,
@@ -106,8 +107,9 @@ router.get('/:id', authenticateToken, async (req: Request, res: Response): Promi
 router.get('/:id/download', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user!;
+    const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { fileBuffer, fileName, mimeType } = await DocumentService.downloadDocument({
-      documentId: req.params.id,
+      documentId: docId,
       userId: user.id,
       userEmail: user.email,
       userRole: user.role,
@@ -131,8 +133,9 @@ router.get('/:id/download', authenticateToken, async (req: Request, res: Respons
 router.get('/:id/preview', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user!;
+    const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { fileBuffer, fileName, mimeType } = await DocumentService.previewDocument({
-      documentId: req.params.id,
+      documentId: docId,
       userId: user.id,
       userEmail: user.email,
       userRole: user.role,
@@ -156,9 +159,10 @@ router.patch('/:id', authenticateToken, async (req: Request, res: Response): Pro
   try {
     const user = req.user!;
     const { title, description, category, classification } = req.body;
+    const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
     const doc = await DocumentService.updateDocument({
-      documentId: req.params.id,
+      documentId: docId,
       title,
       description,
       category,
@@ -181,8 +185,9 @@ router.patch('/:id', authenticateToken, async (req: Request, res: Response): Pro
 router.delete('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user!;
+    const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     await DocumentService.deleteDocument({
-      documentId: req.params.id,
+      documentId: docId,
       userId: user.id,
       userEmail: user.email,
       userRole: user.role,

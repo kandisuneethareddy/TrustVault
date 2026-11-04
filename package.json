@@ -4,6 +4,7 @@
   "description": "TrustVault — Secure Document Sharing with a Cryptographic Evidentiary Audit Trail (RISE Challenge)",
   "private": true,
   "scripts": {
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm --prefix frontend run build",
     "setup": "npm run seed && npm run build:frontend",
     "seed": "node backend/node_modules/tsx/dist/cli.mjs backend/src/db/seed.ts",
     "test": "node backend/node_modules/vitest/vitest.mjs run --root backend",

@@ -12,8 +12,9 @@ function getClientIp(req: Request): string {
 router.get('/:id/permissions', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user!;
+    const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const permissions = await PermissionService.listPermissions({
-      documentId: req.params.id,
+      documentId: docId,
       requestUserId: user.id,
       requestUserEmail: user.email,
       requestUserRole: user.role,
@@ -31,6 +32,7 @@ router.post('/:id/permissions', authenticateToken, async (req: Request, res: Res
   try {
     const user = req.user!;
     const { targetUserId, accessLevel, validUntil } = req.body;
+    const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
     if (!targetUserId || !accessLevel) {
       res.status(400).json({ error: 'targetUserId and accessLevel (READ or EDIT) are required' });
@@ -43,7 +45,7 @@ router.post('/:id/permissions', authenticateToken, async (req: Request, res: Res
     }
 
     const permission = await PermissionService.grantPermission({
-      documentId: req.params.id,
+      documentId: docId,
       targetUserId,
       accessLevel,
       validUntil: validUntil || null,
@@ -65,10 +67,12 @@ router.post('/:id/permissions', authenticateToken, async (req: Request, res: Res
 router.delete('/:id/permissions/:userId', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user!;
+    const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const targetId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
 
     await PermissionService.revokePermission({
-      documentId: req.params.id,
-      targetUserId: req.params.userId,
+      documentId: docId,
+      targetUserId: targetId,
       revokedByUserId: user.id,
       revokedByUserEmail: user.email,
       revokedByUserRole: user.role,
