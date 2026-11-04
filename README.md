@@ -184,3 +184,4 @@ flowchart TD
 - **`PROMPTS.md`:** 5 dated entries detailing AI interactions, flaws caught (including authorization bypass and audit concurrency races), and fixes.
 - **`docs/API_SPECIFICATION.md`:** Full endpoint documentation and RBAC permission matrix.
 - **`Dockerfile` & `docker-compose.yml`:** Containerized multi-stage build for 1-command deployment.
+

@@ -93,3 +93,4 @@ describe('AI Human-in-the-Loop Zero-Trust Safety Invariants', () => {
     expect(auditLogs.logs[0].metadata).toContain('CONFIRMED');
   });
 });
+

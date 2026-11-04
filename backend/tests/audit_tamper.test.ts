@@ -59,3 +59,4 @@ describe('Audit Ledger Cryptographic Integrity & Tamper Evidence', () => {
     expect(verification.corruptedBlock?.reason).toMatch(/Broken chain link/i);
   });
 });
+

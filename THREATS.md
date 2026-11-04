@@ -159,3 +159,4 @@ Shortlisted candidates may be asked:
   ```
 - **What happens if this check is removed?**
   If this check were commented out, the automated test suite in `tests/permission_negative.test.ts` would **immediately fail at Test SECURITY-04** (`SECURITY-04: User B (Bob) CANNOT download Alice’s private document content (403 Forbidden)`), demonstrating that our tests genuinely defend against authorization bypasses.
+

@@ -99,107 +99,198 @@ const THREAT_CATALOG: ThreatEntry[] = [
 ];
 
 export const ThreatsView: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'faq' | 'matrix'>('faq');
   const [expandedId, setExpandedId] = useState<string | null>('TV-THR-01');
+
+  const faqItems = [
+    {
+      q: 'Can someone open a document if they guess or copy the link?',
+      a: 'No. TrustVault never exposes direct static links to files. Every single attempt to view or download a file is checked by the server against the database. If you are not an authorized viewer or owner, the server immediately denies access and logs the blocked attempt.',
+      badge: 'Zero-Trust Check',
+      badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
+    },
+    {
+      q: 'What happens when someone leaves the company or their access is taken away?',
+      a: 'Access stops working in 0 milliseconds. The moment an owner clicks "Revoke Access", that person is blocked on the spot. Even if they had an open browser tab or an active session token, the very next request will fail instantly.',
+      badge: 'Instant Revocation',
+      badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
+    },
+    {
+      q: 'Can someone secretly alter or erase the activity log to hide what they did?',
+      a: 'No. The activity log is mathematically chained using SHA-256 cryptographic hashes. Each entry includes the fingerprint of the previous entry. If someone tries to edit or delete any past entry in the database, the chain breaks immediately and an alert is raised.',
+      badge: 'Tamper-Proof',
+      badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    },
+    {
+      q: 'Can an attacker upload a harmful file or virus disguised as a PDF?',
+      a: 'No. TrustVault inspects the actual binary bytes ("magic bytes") inside the file, not just the file extension. Renaming an .exe file to .pdf is caught and rejected immediately before it can be stored.',
+      badge: 'File Safety Check',
+      badgeColor: 'bg-purple-50 text-purple-700 border-purple-200',
+    },
+    {
+      q: 'Can the AI grant access to anyone without human approval?',
+      a: 'Never. The AI is strictly advisory. It only suggests who might need access and highlights sensitivity. A human document owner must explicitly review and click approve. The machine cannot widen permissions autonomously.',
+      badge: 'Human in Control',
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+    },
+    {
+      q: 'Can someone read files if they steal the physical hard drive or server backup?',
+      a: 'No. All documents are encrypted before they touch the disk using AES-256-GCM encryption with unique keys and initialization vectors. An attacker with raw disk access will only see scrambled ciphertext.',
+      badge: 'Encrypted at Rest',
+      badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
+    },
+    {
+      q: 'What happens if someone takes a photo of their screen with a mobile phone? (The Analog Hole)',
+      a: 'Physics dictates that any screen visible to human eyes can be photographed with an external camera. TrustVault mitigates this by keeping an exact audit trail of everyone who opened the file and when. If a document leaks, the company knows exactly who viewed it.',
+      badge: 'Accepted Risk & Attribution',
+      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
+    },
+  ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-            <ShieldAlert className="h-5 w-5 text-purple-400" />
-            THREATS.md Security Model & Attack Trees
+          <h1 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            <ShieldAlert className="h-5 w-5 text-purple-600" />
+            Security & Threat Protection Guide
           </h1>
-          <p className="text-xs text-slate-400">
-            Exhaustive defense-in-depth analysis: attack vectors, mitigations, automated test mapping, and accepted risks.
+          <p className="text-xs text-slate-500 font-medium">
+            Learn how TrustVault stops document leaks, blocks attacks, and guarantees tamper-proof records.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-            6 Mitigated Vectors
-          </span>
-          <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
-            2 Accepted Residual Risks
-          </span>
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs">
+          <button
+            onClick={() => setActiveTab('faq')}
+            className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
+              activeTab === 'faq'
+                ? 'bg-white text-slate-900 shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Simple Explainer (Q&A)
+          </button>
+          <button
+            onClick={() => setActiveTab('matrix')}
+            className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
+              activeTab === 'matrix'
+                ? 'bg-white text-slate-900 shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Technical STRIDE Matrix
+          </button>
         </div>
       </div>
 
-      {/* Threat List */}
-      <div className="space-y-3">
-        {THREAT_CATALOG.map(threat => {
-          const isExpanded = expandedId === threat.id;
-          const isMitigated = threat.status === 'MITIGATED';
-
-          return (
+      {/* Tab 1: Simple Q&A Explainer */}
+      {activeTab === 'faq' && (
+        <div className="space-y-3">
+          {faqItems.map((item, idx) => (
             <div
-              key={threat.id}
-              className={`rounded-2xl border transition overflow-hidden ${
-                isExpanded
-                  ? 'border-slate-700 bg-slate-900/80 shadow-xl'
-                  : 'border-slate-800/80 bg-slate-900/40 hover:border-slate-700'
-              }`}
+              key={idx}
+              className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2 hover:border-sky-300 transition"
             >
-              <button
-                onClick={() => setExpandedId(isExpanded ? null : threat.id)}
-                className="w-full text-left p-4 flex items-center justify-between gap-4 focus:outline-none"
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>{item.q}</span>
+                </h3>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${item.badgeColor}`}>
+                  {item.badge}
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed pl-6">
+                {item.a}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Tab 2: Technical STRIDE Matrix */}
+      {activeTab === 'matrix' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-xs text-slate-500 font-medium px-1">
+            <span>Threat Model: 6 Mitigated Vectors · 2 Accepted Residual Risks</span>
+            <span>Covered by automated test suites in backend/tests/</span>
+          </div>
+
+          {THREAT_CATALOG.map(threat => {
+            const isExpanded = expandedId === threat.id;
+            const isMitigated = threat.status === 'MITIGATED';
+
+            return (
+              <div
+                key={threat.id}
+                className={`rounded-2xl border transition overflow-hidden bg-white shadow-2xs ${
+                  isExpanded ? 'border-sky-300' : 'border-slate-200 hover:border-slate-300'
+                }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs font-bold text-slate-400">{threat.id}</span>
-                  <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
-                      isMitigated
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                        : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                    }`}
-                  >
-                    {threat.status}
-                  </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                    {threat.category}
-                  </span>
-                  <span className="font-semibold text-xs text-slate-100">{threat.title}</span>
-                </div>
-
-                <div className="text-slate-400 shrink-0">
-                  {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </div>
-              </button>
-
-              {isExpanded && (
-                <div className="px-4 pb-4 pt-1 space-y-3 text-xs border-t border-slate-800/80">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                      <div className="font-semibold text-red-400 text-[11px] uppercase tracking-wider">
-                        Attack Vector & Threat Method
-                      </div>
-                      <p className="text-slate-300 text-[11px] leading-relaxed">{threat.attackVector}</p>
-                      <div className="text-[10px] text-slate-500 font-mono mt-1">Impact: {threat.impact}</div>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                      <div className="font-semibold text-emerald-400 text-[11px] uppercase tracking-wider">
-                        Technical Mitigation Implemented
-                      </div>
-                      <p className="text-slate-300 text-[11px] leading-relaxed">{threat.mitigation}</p>
-                      <div className="flex items-center gap-1.5 text-[10px] text-blue-400 font-mono mt-1">
-                        <Terminal className="h-3 w-3" />
-                        <span>Verified by: {threat.testCaseRef}</span>
-                      </div>
-                    </div>
+                <button
+                  onClick={() => setExpandedId(isExpanded ? null : threat.id)}
+                  className="w-full text-left p-4 flex items-center justify-between gap-4 focus:outline-none cursor-pointer"
+                >
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-mono text-xs font-bold text-slate-500">{threat.id}</span>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
+                        isMitigated
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}
+                    >
+                      {threat.status}
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                      {threat.category}
+                    </span>
+                    <span className="font-bold text-xs text-slate-900">{threat.title}</span>
                   </div>
 
-                  {threat.acceptedRationale && (
-                    <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-800/40 text-[11px] text-amber-200/90">
-                      <strong className="text-amber-400">Accepted Risk Justification:</strong> {threat.acceptedRationale}
+                  <div className="text-slate-400 shrink-0">
+                    {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </div>
+                </button>
+
+                {isExpanded && (
+                  <div className="px-4 pb-4 pt-1 space-y-3 text-xs border-t border-slate-100">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                        <div className="font-semibold text-rose-700 text-[11px] uppercase tracking-wider">
+                          Attack Vector & Potential Impact
+                        </div>
+                        <p className="text-slate-700 text-[11px] leading-relaxed">{threat.attackVector}</p>
+                        <div className="text-[10px] text-slate-500 mt-1">Impact: {threat.impact}</div>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                        <div className="font-semibold text-emerald-700 text-[11px] uppercase tracking-wider">
+                          Technical Defense Implemented
+                        </div>
+                        <p className="text-slate-700 text-[11px] leading-relaxed">{threat.mitigation}</p>
+                        <div className="flex items-center gap-1.5 text-[10px] text-sky-700 font-mono mt-1">
+                          <Terminal className="h-3 w-3" />
+                          <span>Automated Test: {threat.testCaseRef}</span>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+
+                    {threat.acceptedRationale && (
+                      <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900">
+                        <strong className="text-amber-800">Accepted Risk Rationale:</strong> {threat.acceptedRationale}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

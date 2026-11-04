@@ -27,3 +27,4 @@ export const CONFIG = {
   // Genesis Hash for tamper-evident blockchain-style audit ledger
   AUDIT_GENESIS_PREV_HASH: '0000000000000000000000000000000000000000000000000000000000000000',
 };
+

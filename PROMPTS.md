@@ -151,3 +151,4 @@ Never propose or generate stateless token scopes for file downloads without live
   ```
   This logs the perpetrator's user ID, email, role, target document, IP address, and timestamp into the chained audit ledger, enabling real-time detection in the Admin Security Radar.
   This is verified by automated test `SECURITY-06` in `tests/permission_negative.test.ts`.
+

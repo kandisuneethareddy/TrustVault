@@ -102,3 +102,4 @@ CREATE TABLE IF NOT EXISTS ai_advisories (
     FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE,
     FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
 );
+

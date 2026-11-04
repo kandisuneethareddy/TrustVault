@@ -130,3 +130,4 @@ export interface AiAdvisory {
   suggestedGrants: AiSuggestedGrant[];
   riskIndicators: string[];
 }
+

@@ -114,3 +114,4 @@ export interface AuthenticatedRequestUser {
   role: UserRole;
   tokenVersion: number;
 }
+

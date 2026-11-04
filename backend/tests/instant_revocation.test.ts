@@ -106,3 +106,4 @@ describe('Instant Revocation Invariant Verification', () => {
     expect(subsequentCall.body.code).toBe('SESSION_REVOKED');
   });
 });
+

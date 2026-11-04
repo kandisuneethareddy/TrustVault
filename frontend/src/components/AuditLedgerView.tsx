@@ -104,17 +104,34 @@ export const AuditLedgerView: React.FC = () => {
     }
   };
 
+  const getFriendlyActionLabel = (action: string) => {
+    switch (action) {
+      case 'DOCUMENT_UPLOAD': return 'Uploaded Document';
+      case 'DOCUMENT_DOWNLOAD': return 'Downloaded Document';
+      case 'DOCUMENT_READ': return 'Viewed Document';
+      case 'DOCUMENT_DELETE': return 'Deleted Document';
+      case 'DOCUMENT_UPDATE': return 'Updated Document';
+      case 'PERMISSION_GRANT': return 'Granted Access';
+      case 'PERMISSION_REVOKE': return 'Revoked Access';
+      case 'ACCESS_REFUSED': return 'Blocked Attempt';
+      case 'AI_CLASSIFICATION_REVIEWED': return 'AI Suggestion Decision';
+      case 'AUTH_REVOKE_ALL_SESSIONS': return 'Sessions Reset';
+      case 'AUDIT_TAMPER_SIMULATED': return 'Tamper Simulation';
+      default: return action;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header and Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-            <History className="h-5 w-5 text-emerald-400" />
-            Tamper-Evident Cryptographic Ledger
+          <h1 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            <History className="h-5 w-5 text-emerald-600" />
+            Activity History & Tamper-Proof Audit Log
           </h1>
-          <p className="text-xs text-slate-400">
-            Immutable SHA-256 block chain. Every upload, access attempt, download, grant, revocation, and refusal is permanently proven.
+          <p className="text-xs text-slate-500 font-medium">
+            Permanent proof of every upload, view, download, permission change, and blocked unauthorized attempt.
           </p>
         </div>
 
@@ -123,31 +140,31 @@ export const AuditLedgerView: React.FC = () => {
           <button
             onClick={handleVerifyLedger}
             disabled={isVerifying}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-lg shadow-emerald-600/25"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs transition shadow-md shadow-emerald-600/20 cursor-pointer"
           >
             <ShieldCheck className="h-4 w-4" />
-            <span>{isVerifying ? 'Verifying Chain...' : 'Verify Ledger Integrity'}</span>
+            <span>{isVerifying ? 'Checking History...' : 'Verify History Integrity'}</span>
           </button>
 
           {/* Hackathon Judge Tamper Simulator */}
           <button
             onClick={handleSimulateTamper}
             disabled={isTampering}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-950/70 hover:bg-amber-900 border border-amber-800/80 text-amber-300 font-semibold text-xs transition"
-            title="Simulate database tampering to test the verification algorithm"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-semibold text-xs transition cursor-pointer"
+            title="Simulate someone attempting to alter the database to see how TrustVault detects it immediately"
           >
-            <Flame className="h-4 w-4 text-amber-400" />
-            <span>Simulate Tamper Demo</span>
+            <Flame className="h-4 w-4 text-amber-600" />
+            <span>Test Tamper Detection</span>
           </button>
 
-          {/* Export Dropdown */}
+          {/* Export CSV */}
           <button
             onClick={() => handleExport('csv')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition"
-            title="Export CSV audit trail"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer border border-slate-200"
+            title="Download full history report as CSV"
           >
             <Download className="h-4 w-4" />
-            <span>CSV</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
@@ -155,14 +172,14 @@ export const AuditLedgerView: React.FC = () => {
       {/* Filter and Search Bar */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
         <div className="relative md:col-span-6">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search audit trail by actor email, action, reason, or resource ID..."
+            placeholder="Search by person's email, action name, or reason..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && fetchLogs()}
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 shadow-2xs transition"
           />
         </div>
 
@@ -170,11 +187,11 @@ export const AuditLedgerView: React.FC = () => {
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+            className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 font-medium focus:outline-none focus:border-sky-500 shadow-2xs transition"
           >
-            <option value="ALL">Status: ALL (Success & Refused)</option>
-            <option value="SUCCESS">SUCCESS Only</option>
-            <option value="REFUSED">REFUSED (Security Alerts) Only</option>
+            <option value="ALL">Status: All (Allowed & Blocked)</option>
+            <option value="SUCCESS">Allowed Events Only</option>
+            <option value="REFUSED">Blocked Attempts Only</option>
           </select>
         </div>
 
@@ -182,13 +199,13 @@ export const AuditLedgerView: React.FC = () => {
           <select
             value={actionFilter}
             onChange={e => setActionFilter(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+            className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 font-medium focus:outline-none focus:border-sky-500 shadow-2xs transition"
           >
-            <option value="ALL">Action: ALL Events</option>
+            <option value="ALL">Event Type: All Events</option>
             <option value="DOCUMENT_DOWNLOAD">Downloads</option>
-            <option value="ACCESS_REFUSED">Refused Breaches</option>
-            <option value="PERMISSION_REVOKE">Revocations</option>
-            <option value="PERMISSION_GRANT">Grants</option>
+            <option value="ACCESS_REFUSED">Blocked Attempts</option>
+            <option value="PERMISSION_REVOKE">Access Revocations</option>
+            <option value="PERMISSION_GRANT">Access Grants</option>
             <option value="DOCUMENT_UPLOAD">Uploads</option>
             <option value="AI_CLASSIFICATION_REVIEWED">AI Decisions</option>
           </select>
@@ -196,32 +213,32 @@ export const AuditLedgerView: React.FC = () => {
       </div>
 
       {/* Ledger Table */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 overflow-hidden shadow-xl">
+      <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900/90 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+            <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
               <tr>
-                <th className="py-3 px-3 w-16">Seq #</th>
-                <th className="py-3 px-3">Timestamp</th>
-                <th className="py-3 px-4">Actor</th>
+                <th className="py-3 px-3 w-16">Record #</th>
+                <th className="py-3 px-3">Date & Time</th>
+                <th className="py-3 px-4">User</th>
                 <th className="py-3 px-3">Action</th>
-                <th className="py-3 px-3">Status</th>
-                <th className="py-3 px-4">Evidentiary Details</th>
-                <th className="py-3 px-4 font-mono">SHA-256 Block Hash</th>
+                <th className="py-3 px-3">Result</th>
+                <th className="py-3 px-4">Details</th>
+                <th className="py-3 px-4">Tamper Check</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-400">
-                    <div className="inline-block animate-spin h-6 w-6 border-2 border-emerald-500 border-t-transparent rounded-full mb-2"></div>
-                    <div>Loading cryptographic ledger blocks...</div>
+                  <td colSpan={7} className="text-center py-12 text-slate-500">
+                    <div className="inline-block animate-spin h-6 w-6 border-2 border-sky-500 border-t-transparent rounded-full mb-2"></div>
+                    <div>Loading verified history entries...</div>
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-400">
-                    No audit records match the current filter.
+                  <td colSpan={7} className="text-center py-12 text-slate-500">
+                    No activity entries found matching your search.
                   </td>
                 </tr>
               ) : (
@@ -231,34 +248,34 @@ export const AuditLedgerView: React.FC = () => {
                   return (
                     <tr
                       key={log.id}
-                      className={`hover:bg-slate-800/40 transition ${
-                        isRefused ? 'bg-red-950/10' : ''
+                      className={`hover:bg-sky-50/40 transition ${
+                        isRefused ? 'bg-rose-50/40' : ''
                       }`}
                     >
                       {/* Sequence Number */}
-                      <td className="py-3 px-3 font-mono text-slate-400 font-bold">
+                      <td className="py-3 px-3 font-mono text-slate-500 font-bold">
                         #{log.sequenceNumber}
                       </td>
 
                       {/* Timestamp */}
-                      <td className="py-3 px-3 text-slate-400 text-[11px] whitespace-nowrap font-mono">
+                      <td className="py-3 px-3 text-slate-600 text-[11px] whitespace-nowrap">
                         {new Date(log.timestamp).toLocaleTimeString()} · {new Date(log.timestamp).toLocaleDateString()}
                       </td>
 
-                      {/* Actor */}
+                      {/* User */}
                       <td className="py-3 px-4">
-                        <div className="font-semibold text-slate-200">
+                        <div className="font-semibold text-slate-900">
                           {log.userEmail || 'System Core'}
                         </div>
-                        <div className="text-[10px] text-slate-500 font-mono">
-                          {log.userRole ? `Role: ${log.userRole}` : 'Unauthenticated'} · IP: {log.ipAddress}
+                        <div className="text-[10px] text-slate-500">
+                          {log.userRole ? `Role: ${log.userRole}` : 'External'} · IP: {log.ipAddress}
                         </div>
                       </td>
 
                       {/* Action */}
                       <td className="py-3 px-3">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-slate-800 text-slate-300 border border-slate-700">
-                          {log.action}
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                          {getFriendlyActionLabel(log.action)}
                         </span>
                       </td>
 
@@ -267,39 +284,39 @@ export const AuditLedgerView: React.FC = () => {
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase border ${
                             isRefused
-                              ? 'bg-red-500/20 text-red-300 border-red-500/40 glow-red'
-                              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
                           }`}
                         >
-                          {log.status}
+                          {isRefused ? 'Blocked' : 'Allowed'}
                         </span>
                       </td>
 
                       {/* Details / Reason */}
                       <td className="py-3 px-4 max-w-xs">
                         {isRefused ? (
-                          <div className="text-red-400 font-medium text-[11px]">
+                          <div className="text-rose-700 font-medium text-[11px]">
                             {log.reason || 'Unauthorized access attempt'}
                           </div>
                         ) : (
-                          <div className="text-slate-300 text-[11px] truncate">
-                            {log.resourceId ? `Resource: ${log.resourceId}` : ''} {log.reason || ''}
+                          <div className="text-slate-700 text-[11px] truncate">
+                            {log.reason || (log.resourceId ? `Resource: ${log.resourceId}` : 'Authorized request completed')}
                           </div>
                         )}
-                        <div className="text-[10px] text-slate-500 truncate font-mono">
+                        <div className="text-[10px] text-slate-400 truncate font-mono mt-0.5">
                           {log.metadata}
                         </div>
                       </td>
 
-                      {/* Block Hash */}
+                      {/* Checksum / Hash */}
                       <td className="py-3 px-4 font-mono text-[10px]">
-                        <div className="flex items-center gap-1.5 text-blue-400 font-semibold" title={log.hash}>
-                          <Fingerprint className="h-3 w-3 shrink-0 text-blue-400" />
-                          <span>{log.hash.slice(0, 16)}...</span>
+                        <div className="flex items-center gap-1.5 text-sky-700 font-semibold" title={log.hash}>
+                          <Fingerprint className="h-3 w-3 shrink-0 text-sky-600" />
+                          <span>{log.hash.slice(0, 12)}...</span>
                         </div>
-                        <div className="flex items-center gap-1 text-slate-500 text-[9px] mt-0.5" title={log.previousHash}>
+                        <div className="flex items-center gap-1 text-slate-400 text-[9px] mt-0.5" title={log.previousHash}>
                           <Link className="h-2.5 w-2.5 shrink-0" />
-                          <span>prev: {log.previousHash.slice(0, 12)}...</span>
+                          <span>Linked</span>
                         </div>
                       </td>
                     </tr>
@@ -311,29 +328,29 @@ export const AuditLedgerView: React.FC = () => {
         </div>
       </div>
 
-      {/* Cryptographic Verification Modal */}
+      {/* Verification Modal */}
       {showVerifyModal && verification && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-xl rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in">
+          <div className="relative w-full max-w-xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div
-                  className={`p-2 rounded-lg ${
+                  className={`p-2 rounded-xl ${
                     verification.isValid
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                      : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-rose-50 text-rose-700 border border-rose-200'
                   }`}
                 >
                   {verification.isValid ? <ShieldCheck className="h-5 w-5" /> : <ShieldAlert className="h-5 w-5" />}
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-white">Cryptographic Ledger Attestation</h2>
-                  <p className="text-[11px] text-slate-400">Complete SHA-256 block-by-block hash verification walk</p>
+                  <h2 className="text-base font-bold text-slate-900">History Verification Report</h2>
+                  <p className="text-[11px] text-slate-500">Mathematical proof that no logs have been secretly modified or removed</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowVerifyModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
               >
                 ✕
               </button>
@@ -341,66 +358,66 @@ export const AuditLedgerView: React.FC = () => {
 
             {verification.isValid ? (
               <div className="space-y-3 text-xs">
-                <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 space-y-1">
-                  <div className="font-bold flex items-center gap-1.5 text-emerald-400">
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5 text-emerald-700">
                     <CheckCircle2 className="h-4 w-4" />
-                    Ledger Integrity 100% Cryptographically Verified
+                    All History Records Are 100% Intact & Verified
                   </div>
-                  <p className="text-[11px] text-emerald-200/80">
-                    All {verification.totalRecords} chained blocks were re-computed from Genesis hash. Zero insertions, alterations, or deletions detected.
+                  <p className="text-[11px] text-emerald-800 leading-relaxed">
+                    All {verification.totalRecords} records were checked from beginning to end. Every record is perfectly chained together, proving that not a single word has been changed or deleted.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 font-mono text-[11px]">
-                  <div className="flex justify-between text-slate-400">
-                    <span>Total Chained Blocks Walked:</span>
-                    <span className="text-slate-100 font-bold">{verification.totalRecords}</span>
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-[11px]">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Total Activity Records Checked:</span>
+                    <span className="text-slate-900 font-bold">{verification.totalRecords}</span>
                   </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Genesis Anchor Hash:</span>
-                    <span className="text-blue-400">{verification.genesisHash.slice(0, 20)}...</span>
+                  <div className="flex justify-between text-slate-600">
+                    <span>First Anchor Record:</span>
+                    <span className="text-sky-700 font-mono font-semibold">{verification.genesisHash.slice(0, 16)}...</span>
                   </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Latest Chain Tip Hash:</span>
-                    <span className="text-emerald-400">{verification.latestHash?.slice(0, 20)}...</span>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Latest Activity Checksum:</span>
+                    <span className="text-emerald-700 font-mono font-semibold">{verification.latestHash?.slice(0, 16)}...</span>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="space-y-3 text-xs">
-                <div className="p-4 rounded-xl bg-red-950/50 border border-red-800 text-red-300 space-y-1 glow-red">
-                  <div className="font-bold flex items-center gap-1.5 text-red-400 text-sm">
+                <div className="p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5 text-rose-700 text-sm">
                     <ShieldAlert className="h-5 w-5" />
-                    TAMPER ATTACK DETECTED BY CRYPTOGRAPHIC ENGINE
+                    Tamper Detected: Someone Altered an Audit Record!
                   </div>
-                  <p className="text-[11px] text-red-200/90">
-                    {verification.corruptedBlock?.reason}
+                  <p className="text-[11px] text-rose-800 leading-relaxed">
+                    TrustVault detected that record sequence #{verification.corruptedBlock?.sequenceNumber} was illegally modified. Because each record is mathematically linked to the next, the tamper was caught immediately.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 font-mono text-[11px]">
-                  <div className="text-slate-300 font-bold border-b border-slate-800 pb-1">
-                    Corrupted Block Details:
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-[11px]">
+                  <div className="text-slate-900 font-bold border-b border-slate-200 pb-1">
+                    Tampered Block Information:
                   </div>
-                  <div className="text-slate-400">
-                    Sequence Number: <span className="text-red-400 font-bold">#{verification.corruptedBlock?.sequenceNumber}</span>
+                  <div className="text-slate-600">
+                    Record Sequence Number: <span className="text-rose-600 font-bold">#{verification.corruptedBlock?.sequenceNumber}</span>
                   </div>
-                  <div className="text-slate-400 break-all">
-                    Expected Hash: <span className="text-emerald-400">{verification.corruptedBlock?.expectedHash}</span>
+                  <div className="text-slate-600 break-all font-mono text-[10px]">
+                    Expected Checksum: <span className="text-emerald-700">{verification.corruptedBlock?.expectedHash}</span>
                   </div>
-                  <div className="text-slate-400 break-all">
-                    Corrupted Hash: <span className="text-red-400">{verification.corruptedBlock?.actualHash}</span>
+                  <div className="text-slate-600 break-all font-mono text-[10px]">
+                    Corrupted Checksum: <span className="text-rose-600">{verification.corruptedBlock?.actualHash}</span>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="flex justify-end pt-2 border-t border-slate-800">
+            <div className="flex justify-end pt-2 border-t border-slate-100">
               <button
                 onClick={() => setShowVerifyModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition"
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition cursor-pointer"
               >
-                Close Verification Report
+                Close Report
               </button>
             </div>
           </div>

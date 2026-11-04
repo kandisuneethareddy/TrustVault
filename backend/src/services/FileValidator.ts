@@ -161,3 +161,4 @@ export class FileValidator {
     return { isValid: false, mimeType: '', error: `Unsupported file format: ${ext}` };
   }
 }
+

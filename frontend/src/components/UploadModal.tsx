@@ -64,31 +64,31 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpl
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-      <div className="relative w-full max-w-lg rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-6 space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in">
+      <div className="relative w-full max-w-lg rounded-2xl bg-white border border-slate-200 shadow-2xl p-6 space-y-5">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-gradient-to-tr from-sky-50 to-pink-50 text-sky-700 border border-sky-200 shadow-2xs">
               <UploadCloud className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Upload Encrypted Document</h2>
-              <p className="text-[11px] text-slate-400">Payload is encrypted with AES-256-GCM before storage</p>
+              <h2 className="text-base font-bold text-slate-900">Upload & Protect Document</h2>
+              <p className="text-[11px] text-slate-500">Your file is encrypted right away. Only people you invite can open it.</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-red-950/40 border border-red-800/60 text-red-300 text-xs">
-            <AlertTriangle className="h-4 w-4 shrink-0 text-red-400" />
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
             <span>{error}</span>
           </div>
         )}
@@ -96,10 +96,10 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpl
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           {/* File Dropzone */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1.5">Document File</label>
+            <label className="block text-slate-700 font-semibold mb-1.5">Select Document</label>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-xl p-5 text-center cursor-pointer bg-slate-950/40 hover:bg-slate-800/20 transition"
+              className="border-2 border-dashed border-slate-200 hover:border-sky-500 rounded-xl p-5 text-center cursor-pointer bg-slate-50/50 hover:bg-sky-50/40 transition group"
             >
               <input
                 ref={fileInputRef}
@@ -109,15 +109,15 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpl
                 accept=".pdf,.docx,.xlsx,.png,.jpg,.jpeg,.csv,.txt,.json"
               />
               {file ? (
-                <div className="flex items-center justify-center gap-2 text-emerald-400 font-medium">
-                  <FileCheck className="h-5 w-5" />
+                <div className="flex items-center justify-center gap-2 text-emerald-700 font-medium">
+                  <FileCheck className="h-5 w-5 text-emerald-600" />
                   <span>{file.name} ({(file.size / 1024).toFixed(1)} KB)</span>
                 </div>
               ) : (
                 <div className="space-y-1">
-                  <UploadCloud className="h-6 w-6 text-slate-400 mx-auto" />
-                  <div className="text-slate-300 font-medium">Click or drag file to upload</div>
-                  <div className="text-[10px] text-slate-500">PDF, DOCX, XLSX, PNG, JPG, CSV, TXT (Max 25MB)</div>
+                  <UploadCloud className="h-6 w-6 text-slate-400 group-hover:text-sky-600 mx-auto transition" />
+                  <div className="text-slate-700 font-medium">Click to choose a file or drag it here</div>
+                  <div className="text-[10px] text-slate-500">PDF, Word (.docx), Excel (.xlsx), Images (.png, .jpg), Text (.txt, .csv)</div>
                 </div>
               )}
             </div>
@@ -125,79 +125,79 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpl
 
           {/* Title */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Document Title</label>
+            <label className="block text-slate-700 font-semibold mb-1">Document Title</label>
             <input
               type="text"
               required
-              placeholder="e.g. Executive Salary Matrix 2026"
+              placeholder="e.g. Employee Compensation Plan 2026"
               value={title}
               onChange={e => setTitle(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Description (Optional)</label>
+            <label className="block text-slate-700 font-semibold mb-1">Description (Optional)</label>
             <textarea
               rows={2}
-              placeholder="Provide context regarding sensitivity or compliance requirements..."
+              placeholder="Brief note about this document for colleagues..."
               value={description}
               onChange={e => setDescription(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
             />
           </div>
 
           {/* Category & Classification */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Category</label>
+              <label className="block text-slate-700 font-semibold mb-1">Department</label>
               <input
                 type="text"
                 required
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                placeholder="e.g. Finance, Legal, HR"
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-blue-500"
+                placeholder="e.g. Finance, Legal, HR, Operations"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:border-sky-500"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Classification Level</label>
+              <label className="block text-slate-700 font-semibold mb-1">Sensitivity Level</label>
               <select
                 value={classification}
                 onChange={e => setClassification(e.target.value as DocumentClassification)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:border-sky-500"
               >
-                <option value="INTERNAL">INTERNAL</option>
-                <option value="CONFIDENTIAL">CONFIDENTIAL</option>
-                <option value="RESTRICTED">RESTRICTED (Highest)</option>
-                <option value="PUBLIC">PUBLIC</option>
+                <option value="INTERNAL">Internal (Company wide)</option>
+                <option value="CONFIDENTIAL">Confidential (Named recipients)</option>
+                <option value="RESTRICTED">Restricted (Highest sensitivity)</option>
+                <option value="PUBLIC">Public (General)</option>
               </select>
             </div>
           </div>
 
-          {/* Security guarantee callout */}
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400">
-            <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+          {/* Automatic safety check callout */}
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-[11px] text-slate-700">
+            <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold text-slate-300">Evidentiary Guarantee:</span> Magic bytes binary inspection blocks MIME spoofing. Filename is sanitized against path traversal. Upload is written directly into the immutable audit ledger.
+              <span className="font-semibold text-slate-900">Automatic Safety Verification:</span> Scans real file contents to make sure it is a genuine document and not disguised malware. Every upload is logged into the permanent activity record.
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition"
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold transition flex items-center gap-2 shadow-lg shadow-blue-600/30"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 disabled:opacity-50 text-white font-semibold transition flex items-center gap-2 shadow-md shadow-sky-500/25 cursor-pointer"
             >
               {isSubmitting ? (
                 <>
@@ -205,7 +205,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpl
                   <span>Encrypting & Storing...</span>
                 </>
               ) : (
-                <span>Confirm & Encrypt</span>
+                <span>Upload & Protect</span>
               )}
             </button>
           </div>

@@ -3,6 +3,8 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./frontend/index.html",
+    "./frontend/src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -29,3 +31,4 @@ export default {
   },
   plugins: [],
 }
+

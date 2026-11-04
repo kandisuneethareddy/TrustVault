@@ -88,3 +88,4 @@ router.delete('/:id/permissions/:userId', authenticateToken, async (req: Request
 });
 
 export default router;
+

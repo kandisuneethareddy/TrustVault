@@ -197,3 +197,4 @@ Human owner confirms, modifies, or rejects advisory recommendation.
   }
   ```
 - **Evidentiary Output:** Logs both the AI suggestion and human decision into the immutable audit ledger.
+

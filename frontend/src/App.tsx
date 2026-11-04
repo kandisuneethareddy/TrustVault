@@ -155,15 +155,15 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0F17] text-slate-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-sky-50/20 to-pink-50/20 text-slate-900">
       {/* Executive Top Navigation */}
       <TopNav
         currentUser={currentUser}
         onSwitchPersona={handleSwitchPersona}
         onLogout={handleLogout}
         onOpenRevokeSessions={() => {
-          if (window.confirm('Invalidate all active sessions across all devices for this account?')) {
-            api.revokeAllSessions().then(() => alert('All active sessions invalidated.'));
+          if (window.confirm('Sign out across all devices? Any open sessions on your phone or laptop will stop immediately.')) {
+            api.revokeAllSessions().then(() => alert('All active sessions have been safely signed out.'));
           }
         }}
         ledgerVerified={ledgerVerified}
@@ -237,43 +237,44 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* Edit Metadata Modal */}
+      {/* Edit Details Modal */}
       {editDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-md rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-4">
-            <h3 className="text-base font-bold text-white">Edit Document Metadata</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-2xl p-6 space-y-4">
+            <h3 className="text-base font-bold text-slate-900">Edit Document Details</h3>
+            <p className="text-xs text-slate-500">Update the friendly title or description for this document.</p>
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">Title</label>
+                <label className="block text-slate-700 font-semibold mb-1">Title</label>
                 <input
                   type="text"
                   value={editTitle}
                   onChange={e => setEditTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:border-sky-500"
                 />
               </div>
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">Description</label>
+                <label className="block text-slate-700 font-semibold mb-1">Description</label>
                 <textarea
                   rows={3}
                   value={editDescription}
                   onChange={e => setEditDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:border-sky-500"
                 />
               </div>
             </div>
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800 text-xs">
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 text-xs">
               <button
                 onClick={() => setEditDoc(null)}
-                className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium"
+                className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveEdit}
-                className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold"
+                className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold shadow-xs transition cursor-pointer"
               >
-                Save Updates
+                Save Changes
               </button>
             </div>
           </div>
@@ -283,3 +284,4 @@ export const App: React.FC = () => {
   );
 };
 export default App;
+

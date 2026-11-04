@@ -326,3 +326,4 @@ export const Terminal: React.FC<IconProps> = (props) => (
     <line x1="12" x2="20" y1="19" y2="19" />
   </svg>
 );
+

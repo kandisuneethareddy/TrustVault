@@ -39,3 +39,4 @@ describe('File Validation & Anti-Spoofing (Magic Bytes)', () => {
     expect(result.sanitizedName).toBe('legitimate_contract.pdf');
   });
 });
+

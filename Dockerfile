@@ -40,3 +40,4 @@ EXPOSE 4000
 
 # Seed database and start unified server
 CMD ["node", "backend/node_modules/tsx/dist/cli.mjs", "backend/src/server.ts"]
+

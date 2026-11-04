@@ -20,41 +20,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     {
       id: 'documents' as const,
-      label: 'Vault Documents',
+      label: 'My Documents',
       icon: Files,
       badge: documentsCount > 0 ? documentsCount : undefined,
-      badgeColor: 'bg-blue-500/20 text-blue-400',
+      badgeColor: 'bg-sky-100 text-sky-800',
     },
     {
       id: 'audit' as const,
-      label: 'Cryptographic Ledger',
+      label: 'Activity History',
       icon: History,
-      badge: 'SHA-256',
-      badgeColor: 'bg-emerald-500/20 text-emerald-400',
+      badge: 'Tamper-Proof',
+      badgeColor: 'bg-emerald-100 text-emerald-800',
     },
     {
       id: 'security' as const,
-      label: 'Security Command Center',
+      label: 'Security Overview',
       icon: Radar,
       badge: refusedCount > 0 ? `${refusedCount} Alerts` : undefined,
-      badgeColor: 'bg-red-500/20 text-red-400',
+      badgeColor: 'bg-rose-100 text-rose-800',
       adminOnly: true,
     },
     {
       id: 'threats' as const,
-      label: 'THREATS.md Model',
+      label: 'Security & Protections',
       icon: ShieldAlert,
-      badge: 'STRIDE',
-      badgeColor: 'bg-purple-500/20 text-purple-400',
+      badge: 'Explainer',
+      badgeColor: 'bg-purple-100 text-purple-800',
     },
   ];
 
   return (
-    <aside className="w-64 border-r border-slate-800 bg-[#0B0F17] flex flex-col justify-between p-4 hidden md:flex shrink-0">
+    <aside className="w-64 border-r border-slate-200 bg-white/75 backdrop-blur-md flex flex-col justify-between p-4 hidden md:flex shrink-0">
       <div className="space-y-6">
         <div>
-          <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-            Vault Navigation
+          <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">
+            Main Menu
           </div>
           <nav className="space-y-1">
             {navItems.map(item => {
@@ -67,14 +67,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => onSelectTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                     isActive
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 text-white shadow-md shadow-sky-500/25'
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
@@ -92,25 +92,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
         </div>
 
-        {/* Zero-Trust Pillars Summary Card */}
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-200">
-            <ShieldCheck className="h-4 w-4 text-emerald-400" />
-            <span>RISE Architecture Rules</span>
+        {/* Protection Pillars Summary Card */}
+        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-sky-50/70 via-white to-pink-50/50 p-4 space-y-2.5 shadow-2xs">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <span>How TrustVault Protects You</span>
           </div>
-          <ul className="text-[11px] text-slate-400 space-y-1.5 list-disc pl-4">
-            <li><span className="text-slate-200 font-medium">Server Decides:</span> 100% server-evaluated.</li>
-            <li><span className="text-slate-200 font-medium">Evidentiary Proof:</span> Chained SHA-256 blocks.</li>
-            <li><span className="text-slate-200 font-medium">Instant Revocation:</span> Zero-staleness DB checks.</li>
-            <li><span className="text-slate-200 font-medium">AI Human-in-Loop:</span> Autonomous grant disabled.</li>
+          <ul className="text-[11px] text-slate-600 space-y-2 font-medium">
+            <li className="flex items-start gap-1.5">
+              <span className="text-sky-600 font-bold">•</span>
+              <span><strong className="text-slate-900 font-semibold">Server-Checked Access:</strong> The server checks permission every time. Hidden buttons aren't enough.</span>
+            </li>
+            <li className="flex items-start gap-1.5">
+              <span className="text-pink-600 font-bold">•</span>
+              <span><strong className="text-slate-900 font-semibold">Instant Lockout:</strong> Taking access back stops working immediately in 0 seconds.</span>
+            </li>
+            <li className="flex items-start gap-1.5">
+              <span className="text-emerald-600 font-bold">•</span>
+              <span><strong className="text-slate-900 font-semibold">Permanent History:</strong> Every view and download is locked in a tamper-proof record.</span>
+            </li>
+            <li className="flex items-start gap-1.5">
+              <span className="text-indigo-600 font-bold">•</span>
+              <span><strong className="text-slate-900 font-semibold">Human in Control:</strong> AI only suggests. A human always approves.</span>
+            </li>
           </ul>
         </div>
       </div>
 
-      <div className="border-t border-slate-800/80 pt-3 text-[11px] text-slate-500 flex items-center justify-between">
-        <span>AES-256-GCM Vault</span>
-        <span className="flex items-center gap-1 font-mono text-[10px] text-slate-400">
-          <Cpu className="h-3 w-3 text-blue-400" /> v1.0.0
+      <div className="border-t border-slate-200 pt-3 text-[11px] text-slate-500 flex items-center justify-between font-medium">
+        <span>Protected Storage</span>
+        <span className="flex items-center gap-1 font-mono text-[10px] text-slate-600 font-semibold">
+          <Cpu className="h-3 w-3 text-sky-600" /> TrustVault v1.0
         </span>
       </div>
     </aside>

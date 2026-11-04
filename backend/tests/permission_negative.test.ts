@@ -141,3 +141,4 @@ describe('Zero-Trust Negative Security Tests (RISE Specification)', () => {
     expect(metaRes.body.document.isOwner).toBe(true);
   });
 });
+
