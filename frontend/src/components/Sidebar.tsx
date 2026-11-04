@@ -1,17 +1,14 @@
 import React from 'react';
 import {
   Files,
-  ShieldCheck,
   History,
   Radar,
   ShieldAlert,
   Cpu,
-  Home,
   UploadCloud,
   KeyRound,
   Search,
   Bell,
-  Settings,
   Activity,
   User as UserIcon,
 } from './icons';
@@ -45,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'All Documents',
       icon: Files,
       badge: documentsCount > 0 ? documentsCount : undefined,
-      badgeColor: 'bg-sky-100 text-sky-800',
+      badgeColor: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
     },
     {
       id: 'upload',
@@ -79,14 +76,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Activity Ledger',
       icon: History,
       badge: 'SHA-256',
-      badgeColor: 'bg-emerald-100 text-emerald-800',
+      badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
     },
     {
       id: 'security',
       label: 'Security Radar',
       icon: Radar,
       badge: refusedCount > 0 ? `${refusedCount} Blocked` : undefined,
-      badgeColor: 'bg-rose-100 text-rose-800',
+      badgeColor: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300',
       adminOnly: true,
     },
     {
@@ -94,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Threats & Defenses',
       icon: ShieldAlert,
       badge: 'STRIDE',
-      badgeColor: 'bg-purple-100 text-purple-800',
+      badgeColor: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300',
     },
     {
       id: 'profile',
@@ -106,12 +103,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isOwnerOrAdmin = userRole === 'owner' || userRole === 'admin';
 
   return (
-    <aside className="w-64 border-r border-slate-200 bg-white flex flex-col justify-between p-4 hidden md:flex shrink-0">
+    <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between p-4 hidden md:flex shrink-0 transition-colors">
       <div className="space-y-6">
         {/* Workspace Management */}
         <div>
-          <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">
-            Document Workspace
+          <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2.5">
+            Workspace
           </div>
           <nav className="space-y-1">
             {primaryNavItems.map(item => {
@@ -127,11 +124,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                     isActive
                       ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white shadow-md shadow-sky-500/25'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                     <span>{item.label}</span>
                   </div>
                   {item.badge !== undefined && (
@@ -151,8 +148,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Security & Verification Section */}
         <div>
-          <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">
-            Security & Compliance
+          <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2.5">
+            Security & Controls
           </div>
           <nav className="space-y-1">
             {complianceNavItems.map(item => {
@@ -168,11 +165,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                     isActive
                       ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white shadow-md shadow-sky-500/25'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/80'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                     <span>{item.label}</span>
                   </div>
                   {item.badge !== undefined && (
@@ -189,42 +186,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </nav>
         </div>
-
-        {/* Invariant Pillars Quick Card */}
-        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-sky-50/70 via-white to-pink-50/50 p-4 space-y-2 shadow-2xs">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <span>Guaranteed Protections</span>
-          </div>
-          <ul className="text-[11px] text-slate-600 space-y-1.5 font-medium">
-            <li className="flex items-start gap-1.5">
-              <span className="text-sky-600 font-bold">•</span>
-              <span>
-                <strong className="text-slate-900 font-semibold">Live Verification:</strong> Server tests permission on every single byte.
-              </span>
-            </li>
-            <li className="flex items-start gap-1.5">
-              <span className="text-pink-600 font-bold">•</span>
-              <span>
-                <strong className="text-slate-900 font-semibold">0ms Revocation:</strong> Revoked tokens fail immediately.
-              </span>
-            </li>
-            <li className="flex items-start gap-1.5">
-              <span className="text-emerald-600 font-bold">•</span>
-              <span>
-                <strong className="text-slate-900 font-semibold">SHA-256 Ledger:</strong> Audit rows cannot be modified or hidden.
-              </span>
-            </li>
-          </ul>
-        </div>
       </div>
 
-      <div className="border-t border-slate-200 pt-3 text-[11px] text-slate-500 flex items-center justify-between font-medium">
-        <span>Protected Storage</span>
-        <span className="flex items-center gap-1 font-mono text-[10px] text-slate-600 font-semibold">
-          <Cpu className="h-3 w-3 text-sky-600" /> TrustVault v1.0
+      <div className="border-t border-slate-200 dark:border-slate-800 pt-3 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between font-medium">
+        <span>TrustVault Protected</span>
+        <span className="flex items-center gap-1 font-mono text-[10px] text-slate-600 dark:text-slate-400 font-semibold">
+          <Cpu className="h-3 w-3 text-sky-600" /> v1.0
         </span>
       </div>
     </aside>
   );
 };
+
+export default Sidebar;

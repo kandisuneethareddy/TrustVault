@@ -50,6 +50,25 @@ export const App: React.FC = () => {
   const [ledgerVerified, setLedgerVerified] = useState(true);
   const [refusedCount, setRefusedCount] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('trustvault_theme') as 'light' | 'dark') || 'light';
+  });
+
+  // Apply dark mode class to html and body
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+    }
+    localStorage.setItem('trustvault_theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
 
   // Modals (Preview & AI Advisory)
@@ -183,6 +202,8 @@ export const App: React.FC = () => {
         currentUser={currentUser}
         onNavigate={handleNavigate}
         onSwitchPersona={handleSwitchPersona}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
     );
   }
@@ -217,7 +238,7 @@ export const App: React.FC = () => {
 
   // Authenticated workspace shell
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Top Navigation */}
       <TopNav
         currentUser={currentUser}
@@ -236,6 +257,8 @@ export const App: React.FC = () => {
         unreadNotifications={unreadNotifications}
         ledgerVerified={ledgerVerified}
         totalRefused={refusedCount}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Workspace Body */}
