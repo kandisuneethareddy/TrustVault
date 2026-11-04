@@ -67,13 +67,36 @@ class ApiService {
   }
 
   // --- Auth APIs ---
-  public async login(email: string, password: string):Promise<{ user: User; token: string }> {
+  public async login(email: string, password: string): Promise<{ user: User; token: string }> {
     const res = await this.request<{ user: User; token: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
     this.setToken(res.token);
     return res;
+  }
+
+  public async register(payload: { email: string; password: string; name: string; role?: string; department?: string }): Promise<{ user: User; token: string }> {
+    const res = await this.request<{ user: User; token: string }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    this.setToken(res.token);
+    return res;
+  }
+
+  public async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  }
+
+  public async updateProfile(payload: { name?: string; department?: string }): Promise<{ user: User; message: string }> {
+    return this.request<{ user: User; message: string }>('/auth/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
   }
 
   public async demoSwitch(email: string): Promise<{ user: User; token: string }> {
@@ -273,6 +296,19 @@ class ApiService {
 
   public async getRefusedAttempts(): Promise<{ refusedAttempts: any[] }> {
     return this.request<{ refusedAttempts: any[] }>('/admin/refused-attempts');
+  }
+
+  // --- Notifications APIs ---
+  public async getNotifications(): Promise<{ notifications: any[] }> {
+    return this.request<{ notifications: any[] }>('/notifications');
+  }
+
+  public async markNotificationRead(id: string): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>(`/notifications/${id}/read`, { method: 'POST' });
+  }
+
+  public async markAllNotificationsRead(): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>('/notifications/read-all', { method: 'POST' });
   }
 }
 

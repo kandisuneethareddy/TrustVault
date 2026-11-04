@@ -90,6 +90,65 @@ router.get('/users', authenticateToken, (req: Request, res: Response): void => {
   res.json({ users });
 });
 
+// POST /api/auth/change-password
+router.post('/change-password', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = req.user!;
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ error: 'Current password and new password are required' });
+      return;
+    }
+    if (newPassword.length < 8) {
+      res.status(400).json({ error: 'New password must be at least 8 characters long' });
+      return;
+    }
+
+    const db = getDatabase();
+    const userRow = db.prepare('SELECT id, password_hash, token_version FROM users WHERE id = ?').get(user.id) as any;
+    if (!userRow) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const bcrypt = await import('bcrypt');
+    const valid = await bcrypt.compare(currentPassword, userRow.password_hash);
+    if (!valid) {
+      res.status(400).json({ error: 'Current password is incorrect' });
+      return;
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    db.prepare('UPDATE users SET password_hash = ?, token_version = token_version + 1, updated_at = datetime(\'now\') WHERE id = ?').run(newHash, user.id);
+
+    res.json({ message: 'Password successfully updated. All active sessions have been secured.' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/auth/profile
+router.patch('/profile', authenticateToken, (req: Request, res: Response): void => {
+  try {
+    const user = req.user!;
+    const { name, department } = req.body;
+    const db = getDatabase();
+
+    db.prepare(`
+      UPDATE users 
+      SET name = COALESCE(?, name),
+          department = COALESCE(?, department),
+          updated_at = datetime('now')
+      WHERE id = ?
+    `).run(name || null, department || null, user.id);
+
+    const updated = AuthService.getUserById(user.id);
+    res.json({ user: updated, message: 'Profile updated successfully' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/auth/demo-switch (For quick role testing by hackathon judges)
 router.post('/demo-switch', (req: Request, res: Response): void => {
   const { email } = req.body;

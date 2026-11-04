@@ -1,39 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { TopNav } from './components/TopNav';
 import { Sidebar } from './components/Sidebar';
-import { DocumentsView } from './components/DocumentsView';
-import { UploadModal } from './components/UploadModal';
 import { DocumentPreviewModal } from './components/DocumentPreviewModal';
-import { PermissionModal } from './components/PermissionModal';
 import { AiAdvisoryModal } from './components/AiAdvisoryModal';
-import { AuditLedgerView } from './components/AuditLedgerView';
-import { SecurityRadarView } from './components/SecurityRadarView';
-import { ThreatsView } from './components/ThreatsView';
+
+// Dedicated Pages
+import { HomePage } from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { DocumentsPage } from './pages/DocumentsPage';
+import { UploadPage } from './pages/UploadPage';
+import { DocumentDetailsPage } from './pages/DocumentDetailsPage';
+import { PermissionsPage } from './pages/PermissionsPage';
+import { SearchPage } from './pages/SearchPage';
+import { AuditPage } from './pages/AuditPage';
+import { SecurityAlertsPage } from './pages/SecurityAlertsPage';
+import { NotificationsPage } from './pages/NotificationsPage';
+import { ThreatsGuidePage } from './pages/ThreatsGuidePage';
+import { ProfilePage } from './pages/ProfilePage';
+
 import { DocumentItem, User } from './types';
 import { api } from './services/api';
 
+export type PageId =
+  | 'home'
+  | 'login'
+  | 'register'
+  | 'dashboard'
+  | 'documents'
+  | 'upload'
+  | 'document-details'
+  | 'permissions'
+  | 'search'
+  | 'audit'
+  | 'security'
+  | 'notifications'
+  | 'threats'
+  | 'profile';
+
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentTab, setCurrentTab] = useState<'documents' | 'audit' | 'security' | 'threats'>('documents');
+  const [currentPage, setCurrentPage] = useState<PageId>('dashboard');
+  const [pageParams, setPageParams] = useState<any>({});
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
   const [ledgerVerified, setLedgerVerified] = useState(true);
   const [refusedCount, setRefusedCount] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
-  // Modals state
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  // Modals (Preview & AI Advisory)
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
-  const [permissionsDoc, setPermissionsDoc] = useState<DocumentItem | null>(null);
   const [aiDoc, setAiDoc] = useState<DocumentItem | null>(null);
-  const [editDoc, setEditDoc] = useState<DocumentItem | null>(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
 
-  // Initial initialization
+  // Initial authentication check
   useEffect(() => {
-    // If no token, default to Alice (Document Owner) for immediate presentation
     const token = api.getToken();
     if (!token) {
+      // Default to Alice Chen (Document Owner) for immediate presentation
       handleSwitchPersona('alice@trustvault.corp');
     } else {
       api
@@ -42,6 +66,7 @@ export const App: React.FC = () => {
           setCurrentUser(res.user);
           loadDocuments();
           checkTelemetry();
+          loadNotificationCount();
         })
         .catch(() => {
           handleSwitchPersona('alice@trustvault.corp');
@@ -51,6 +76,7 @@ export const App: React.FC = () => {
     const handleAuthRevoked = (e: any) => {
       alert(`⚠️ ${e.detail || 'Session was revoked by server.'}`);
       setCurrentUser(null);
+      setCurrentPage('login');
     };
 
     window.addEventListener('trustvault_auth_revoked', handleAuthRevoked);
@@ -77,7 +103,17 @@ export const App: React.FC = () => {
       const refusedRes = await api.queryAuditLogs({ status: 'REFUSED', limit: 1 });
       setRefusedCount(refusedRes.total);
     } catch (err) {
-      // Non-admin might not have full stats, which is expected
+      // Telemetry might be limited for viewers
+    }
+  };
+
+  const loadNotificationCount = async () => {
+    try {
+      const res = await api.getNotifications();
+      const unread = res.notifications.filter(n => !n.isRead).length;
+      setUnreadNotifications(unread);
+    } catch {
+      // Ignore if not logged in
     }
   };
 
@@ -87,6 +123,9 @@ export const App: React.FC = () => {
       setCurrentUser(res.user);
       await loadDocuments();
       await checkTelemetry();
+      await loadNotificationCount();
+      // Ensure we go to dashboard when switching persona
+      setCurrentPage('dashboard');
     } catch (err: any) {
       alert(`Failed to switch persona: ${err.message}`);
     }
@@ -96,12 +135,18 @@ export const App: React.FC = () => {
     api.setToken(null);
     setCurrentUser(null);
     setDocuments([]);
+    setCurrentPage('home');
   };
 
-  const handleUploadSubmit = async (formData: FormData) => {
-    await api.uploadDocument(formData);
-    await loadDocuments();
-    await checkTelemetry();
+  const handleNavigate = (page: string, params?: any) => {
+    setCurrentPage(page as PageId);
+    if (params) {
+      setPageParams(params);
+    } else {
+      setPageParams({});
+    }
+    // Refresh notifications count periodically on navigation
+    loadNotificationCount();
   };
 
   const handleDownload = async (doc: DocumentItem) => {
@@ -113,6 +158,7 @@ export const App: React.FC = () => {
       a.download = doc.fileName;
       a.click();
       URL.revokeObjectURL(url);
+      await checkTelemetry();
     } catch (err: any) {
       alert(`Download Refused: ${err.message}`);
       await checkTelemetry();
@@ -120,11 +166,6 @@ export const App: React.FC = () => {
   };
 
   const handleDelete = async (doc: DocumentItem) => {
-    const confirm = window.confirm(
-      `Are you sure you want to permanently delete '${doc.title}'? The encrypted ciphertext will be securely expunged.`
-    );
-    if (!confirm) return;
-
     try {
       await api.deleteDocument(doc.id);
       await loadDocuments();
@@ -134,85 +175,183 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleStartEdit = (doc: DocumentItem) => {
-    setEditDoc(doc);
-    setEditTitle(doc.title);
-    setEditDescription(doc.description);
-  };
+  // If currently on public pages (home, login, register) without full app chrome
+  if (currentPage === 'home') {
+    return (
+      <HomePage
+        currentUser={currentUser}
+        onNavigate={handleNavigate}
+        onSwitchPersona={handleSwitchPersona}
+      />
+    );
+  }
 
-  const handleSaveEdit = async () => {
-    if (!editDoc) return;
-    try {
-      await api.updateDocument(editDoc.id, {
-        title: editTitle,
-        description: editDescription,
-      });
-      setEditDoc(null);
-      await loadDocuments();
-    } catch (err: any) {
-      alert(`Update failed: ${err.message}`);
-    }
-  };
+  if (currentPage === 'login') {
+    return (
+      <LoginPage
+        onLoginSuccess={user => {
+          setCurrentUser(user);
+          loadDocuments();
+          checkTelemetry();
+          setCurrentPage('dashboard');
+        }}
+        onNavigate={handleNavigate}
+      />
+    );
+  }
 
+  if (currentPage === 'register') {
+    return (
+      <RegisterPage
+        onRegisterSuccess={user => {
+          setCurrentUser(user);
+          loadDocuments();
+          checkTelemetry();
+          setCurrentPage('dashboard');
+        }}
+        onNavigate={handleNavigate}
+      />
+    );
+  }
+
+  // Authenticated workspace shell
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-sky-50/20 to-pink-50/20 text-slate-900">
-      {/* Executive Top Navigation */}
+    <div className="min-h-screen flex flex-col bg-white text-slate-900">
+      {/* Top Navigation */}
       <TopNav
         currentUser={currentUser}
         onSwitchPersona={handleSwitchPersona}
         onLogout={handleLogout}
         onOpenRevokeSessions={() => {
-          if (window.confirm('Sign out across all devices? Any open sessions on your phone or laptop will stop immediately.')) {
-            api.revokeAllSessions().then(() => alert('All active sessions have been safely signed out.'));
+          if (
+            window.confirm(
+              'Sign out across all devices? Any open sessions on other computers will stop immediately in 0ms.'
+            )
+          ) {
+            api.revokeAllSessions().then(() => alert('All active sessions have been safely terminated.'));
           }
         }}
+        onNavigate={handleNavigate}
+        unreadNotifications={unreadNotifications}
         ledgerVerified={ledgerVerified}
         totalRefused={refusedCount}
       />
 
-      {/* Main Layout Body */}
+      {/* Main Workspace Body */}
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
-        {/* Sidebar */}
+        {/* Navigation Sidebar */}
         <Sidebar
-          currentTab={currentTab}
-          onSelectTab={setCurrentTab}
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
           userRole={currentUser?.role || 'viewer'}
           documentsCount={documents.length}
           refusedCount={refusedCount}
+          unreadNotificationsCount={unreadNotifications}
         />
 
-        {/* Content Pane */}
+        {/* Dedicated Content Pane */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          {currentTab === 'documents' && (
-            <DocumentsView
-              documents={documents}
+          {/* Dashboard Page */}
+          {currentPage === 'dashboard' && (
+            <DashboardPage
               currentUser={currentUser}
-              onOpenUpload={() => setUploadModalOpen(true)}
-              onPreview={doc => setPreviewDoc(doc)}
-              onDownload={handleDownload}
-              onOpenPermissions={doc => setPermissionsDoc(doc)}
-              onOpenAiAdvisory={doc => setAiDoc(doc)}
-              onDelete={handleDelete}
-              onUpdate={handleStartEdit}
-              isLoading={isLoadingDocs}
+              documents={documents}
+              onNavigate={handleNavigate}
             />
           )}
 
-          {currentTab === 'audit' && <AuditLedgerView />}
+          {/* Protected Documents Repository */}
+          {currentPage === 'documents' && (
+            <DocumentsPage
+              documents={documents}
+              currentUser={currentUser}
+              isLoading={isLoadingDocs}
+              onNavigate={handleNavigate}
+              onPreview={doc => setPreviewDoc(doc)}
+              onDownload={handleDownload}
+              onDelete={handleDelete}
+              onOpenAiAdvisory={doc => setAiDoc(doc)}
+            />
+          )}
 
-          {currentTab === 'security' && <SecurityRadarView />}
+          {/* Dedicated Upload Page */}
+          {currentPage === 'upload' && (
+            <UploadPage
+              currentUser={currentUser}
+              onNavigate={handleNavigate}
+              onUploadSuccess={async () => {
+                await loadDocuments();
+                await checkTelemetry();
+              }}
+            />
+          )}
 
-          {currentTab === 'threats' && <ThreatsView />}
+          {/* Dedicated Document Details Page */}
+          {currentPage === 'document-details' && (
+            <DocumentDetailsPage
+              documentId={pageParams.documentId}
+              currentUser={currentUser}
+              onNavigate={handleNavigate}
+              onDownload={handleDownload}
+            />
+          )}
+
+          {/* Dedicated Permissions & Instant Revocation Page */}
+          {currentPage === 'permissions' && (
+            <PermissionsPage
+              initialDocumentId={pageParams.documentId}
+              documents={documents}
+              currentUser={currentUser}
+              onNavigate={handleNavigate}
+            />
+          )}
+
+          {/* Dedicated Search Page */}
+          {currentPage === 'search' && (
+            <SearchPage
+              documents={documents}
+              currentUser={currentUser}
+              onNavigate={handleNavigate}
+              onDownload={handleDownload}
+            />
+          )}
+
+          {/* Dedicated Tamper-Evident Audit Page */}
+          {currentPage === 'audit' && (
+            <AuditPage onNavigate={handleNavigate} />
+          )}
+
+          {/* Dedicated Security Alerts Radar Page */}
+          {currentPage === 'security' && (
+            <SecurityAlertsPage onNavigate={handleNavigate} />
+          )}
+
+          {/* Dedicated Notification Center */}
+          {currentPage === 'notifications' && (
+            <NotificationsPage
+              currentUser={currentUser}
+              onNavigate={handleNavigate}
+            />
+          )}
+
+          {/* Dedicated Security Model & Threats Guide (THREATS.md) */}
+          {currentPage === 'threats' && (
+            <ThreatsGuidePage onNavigate={handleNavigate} />
+          )}
+
+          {/* Dedicated User Account Profile & Settings */}
+          {currentPage === 'profile' && (
+            <ProfilePage
+              currentUser={currentUser}
+              onNavigate={handleNavigate}
+              onLogout={handleLogout}
+              onUserUpdated={user => setCurrentUser(user)}
+            />
+          )}
         </main>
       </div>
 
-      {/* Modals */}
-      <UploadModal
-        isOpen={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-        onUpload={handleUploadSubmit}
-      />
-
+      {/* Document Safe Preview Modal */}
       <DocumentPreviewModal
         isOpen={!!previewDoc}
         document={previewDoc}
@@ -220,13 +359,7 @@ export const App: React.FC = () => {
         onDownload={handleDownload}
       />
 
-      <PermissionModal
-        isOpen={!!permissionsDoc}
-        document={permissionsDoc}
-        onClose={() => setPermissionsDoc(null)}
-        currentUser={currentUser}
-      />
-
+      {/* AI Advisory Modal */}
       <AiAdvisoryModal
         isOpen={!!aiDoc}
         document={aiDoc}
@@ -236,52 +369,8 @@ export const App: React.FC = () => {
           checkTelemetry();
         }}
       />
-
-      {/* Edit Details Modal */}
-      {editDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-2xl p-6 space-y-4">
-            <h3 className="text-base font-bold text-slate-900">Edit Document Details</h3>
-            <p className="text-xs text-slate-500">Update the friendly title or description for this document.</p>
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block text-slate-700 font-semibold mb-1">Title</label>
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={e => setEditTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:border-sky-500"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-semibold mb-1">Description</label>
-                <textarea
-                  rows={3}
-                  value={editDescription}
-                  onChange={e => setEditDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:border-sky-500"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 text-xs">
-              <button
-                onClick={() => setEditDoc(null)}
-                className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold shadow-xs transition cursor-pointer"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
-export default App;
 
+export default App;

@@ -3,6 +3,7 @@ import { getDatabase } from '../db/database';
 import { AccessLevel, PermissionRecord, UserRole } from '../types';
 import { AuditLogService } from './AuditLogService';
 import { PermissionEngine } from './PermissionEngine';
+import { NotificationService } from './NotificationService';
 
 export class PermissionService {
   /**
@@ -99,6 +100,19 @@ export class PermissionService {
       },
     });
 
+    // Notify recipient
+    try {
+      const doc = db.prepare('SELECT title FROM documents WHERE id = ?').get(params.documentId) as any;
+      NotificationService.createNotification({
+        userId: params.targetUserId,
+        title: 'Document Access Granted',
+        message: `${params.grantedByUserEmail} granted you ${params.accessLevel} access to '${doc?.title || 'Document'}'.`,
+        type: 'GRANT',
+      });
+    } catch (e) {
+      // Ignore notification non-fatal errors
+    }
+
     return {
       id: permission.id,
       documentId: permission.document_id,
@@ -176,6 +190,19 @@ export class PermissionService {
         instantRevocationTimestamp: new Date().toISOString(),
       },
     });
+
+    // Notify target user of instant revocation
+    try {
+      const doc = db.prepare('SELECT title FROM documents WHERE id = ?').get(params.documentId) as any;
+      NotificationService.createNotification({
+        userId: params.targetUserId,
+        title: 'Access Instantly Revoked',
+        message: `${params.revokedByUserEmail} revoked your access to '${doc?.title || 'Document'}'. Any active sessions or links have stopped immediately.`,
+        type: 'REVOKE',
+      });
+    } catch (e) {
+      // Ignore notification non-fatal errors
+    }
   }
 
   /**

@@ -15,6 +15,7 @@ import permissionRoutes from './routes/permission.routes';
 import auditRoutes from './routes/audit.routes';
 import aiRoutes from './routes/ai.routes';
 import adminRoutes from './routes/admin.routes';
+import notificationRoutes from './routes/notification.routes';
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use('/api/documents', permissionRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Health & System Status Endpoint
 app.get('/api/health', (req: Request, res: Response) => {
