@@ -41,7 +41,9 @@ export type PageId =
 
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentPage, setCurrentPage] = useState<PageId>('dashboard');
+  const [currentPage, setCurrentPage] = useState<PageId>(() => {
+    return api.getToken() ? 'dashboard' : 'login';
+  });
   const [pageParams, setPageParams] = useState<any>({});
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [recentLogs, setRecentLogs] = useState<AuditLog[]>([]);
@@ -70,7 +72,6 @@ export const App: React.FC = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
-
   // Modals (Preview & AI Advisory)
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
   const [aiDoc, setAiDoc] = useState<DocumentItem | null>(null);
@@ -79,19 +80,23 @@ export const App: React.FC = () => {
   useEffect(() => {
     const token = api.getToken();
     if (!token) {
-      // Default to Alice Chen (Document Owner) for immediate presentation
-      handleSwitchPersona('alice@trustvault.corp');
-    } else {
-      api
-        .getMe()
-        .then(res => {
-          setCurrentUser(res.user);
-          Promise.all([loadDocuments(), checkTelemetry(), loadNotificationCount()]);
-        })
-        .catch(() => {
-          handleSwitchPersona('alice@trustvault.corp');
-        });
+      // Default directly to Login/Register screen when visiting without a session
+      setCurrentUser(null);
+      setCurrentPage('login');
+      return;
     }
+
+    api
+      .getMe()
+      .then(res => {
+        setCurrentUser(res.user);
+        Promise.all([loadDocuments(), checkTelemetry(), loadNotificationCount()]);
+      })
+      .catch(() => {
+        api.setToken(null);
+        setCurrentUser(null);
+        setCurrentPage('login');
+      });
 
     const handleAuthRevoked = (e: any) => {
       alert(`⚠️ ${e.detail || 'Session was revoked by server.'}`);
@@ -155,7 +160,7 @@ export const App: React.FC = () => {
     api.setToken(null);
     setCurrentUser(null);
     setDocuments([]);
-    setCurrentPage('home');
+    setCurrentPage('login');
   };
 
   const handleNavigate = (page: string, params?: any) => {
@@ -195,13 +200,12 @@ export const App: React.FC = () => {
     }
   };
 
-  // If currently on public pages (home, login, register) without full app chrome
+  // If currently on public pages (home, login, register)
   if (currentPage === 'home') {
     return (
       <HomePage
         currentUser={currentUser}
         onNavigate={handleNavigate}
-        onSwitchPersona={handleSwitchPersona}
         theme={theme}
         onToggleTheme={handleToggleTheme}
       />
@@ -218,6 +222,10 @@ export const App: React.FC = () => {
           setCurrentPage('dashboard');
         }}
         onNavigate={handleNavigate}
+        onNavigateRegister={() => handleNavigate('register')}
+        onNavigateHome={() => handleNavigate('home')}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
     );
   }
@@ -232,6 +240,10 @@ export const App: React.FC = () => {
           setCurrentPage('dashboard');
         }}
         onNavigate={handleNavigate}
+        onNavigateLogin={() => handleNavigate('login')}
+        onNavigateHome={() => handleNavigate('home')}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
     );
   }
@@ -242,7 +254,6 @@ export const App: React.FC = () => {
       {/* Top Navigation */}
       <TopNav
         currentUser={currentUser}
-        onSwitchPersona={handleSwitchPersona}
         onLogout={handleLogout}
         onOpenRevokeSessions={() => {
           if (
@@ -263,7 +274,7 @@ export const App: React.FC = () => {
 
       {/* Main Workspace Body */}
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
-        {/* Navigation Sidebar */}
+        {/* Navigation Sidebar (Left side with combination color) */}
         <Sidebar
           currentPage={currentPage}
           onNavigate={handleNavigate}

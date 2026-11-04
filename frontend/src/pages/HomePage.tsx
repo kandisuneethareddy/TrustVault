@@ -8,15 +8,13 @@ import {
   ArrowRight,
   Sun,
   Moon,
-  Eye,
-  FileText,
 } from '../components/icons';
 import { User } from '../types';
 
 interface HomePageProps {
   currentUser?: User | null;
   onNavigate: (page: string, params?: any) => void;
-  onSwitchPersona: (email: string) => void;
+  onSwitchPersona?: (email: string) => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
 }
@@ -24,7 +22,6 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({
   currentUser,
   onNavigate,
-  onSwitchPersona,
   theme = 'light',
   onToggleTheme,
 }) => {
@@ -38,7 +35,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             onClick={() => onNavigate(currentUser ? 'dashboard' : 'home')}
             className="flex items-center gap-2.5 cursor-pointer"
           >
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-sm shadow-sky-500/20">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-sky-500 via-sky-600 to-pink-500 flex items-center justify-center text-white shadow-sm shadow-sky-500/20">
               <Shield className="h-5 w-5" />
             </div>
             <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
@@ -62,9 +59,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             {currentUser ? (
               <button
                 onClick={() => onNavigate('dashboard')}
-                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition shadow-sm cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-pink-500 hover:from-sky-600 hover:to-pink-600 text-white font-bold text-xs transition shadow-sm cursor-pointer"
               >
-                Go to Vault Dashboard
+                Go to My Dashboard
               </button>
             ) : (
               <div className="flex items-center gap-2">
@@ -75,10 +72,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                   Sign In
                 </button>
                 <button
-                  onClick={() => onSwitchPersona('alice@trustvault.corp')}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition cursor-pointer"
+                  onClick={() => onNavigate('register')}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-pink-500 hover:from-sky-600 hover:to-pink-600 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition cursor-pointer"
                 >
-                  Open Vault
+                  Register Account
                 </button>
               </div>
             )}
@@ -90,45 +87,40 @@ export const HomePage: React.FC<HomePageProps> = ({
       <section className="pt-16 pb-20 px-4 sm:px-6 max-w-4xl mx-auto text-center space-y-6">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 dark:bg-sky-950/80 border border-sky-200 dark:border-sky-800 text-xs font-semibold text-sky-800 dark:text-sky-300">
           <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-          <span>Simple, Safe & Verified File Sharing</span>
+          <span>Zero-Trust Confidential Document Management</span>
         </div>
 
         <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-          The wrong person can never read it.{' '}
-          <span className="text-sky-600 dark:text-sky-400">And you can prove who did.</span>
+          Your Documents. Your Control.{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-pink-500">
+            Your Trust.
+          </span>
         </h1>
 
         <p className="text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          Share sensitive contracts, salary letters, and drawings with named people. If you take access away, it stops working instantly. Every access attempt is locked into an evidentiary, tamper-proof record.
+          Securely manage, share, and monitor confidential documents with individual document-level access control, instant revocation, and an immutable cryptographic audit ledger.
         </p>
 
-        {/* 1-Click Role Testing Buttons */}
+        {/* Action Buttons */}
         <div className="pt-4 flex flex-wrap justify-center gap-3">
           <button
-            onClick={() => onSwitchPersona('alice@trustvault.corp')}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition cursor-pointer flex items-center gap-2"
+            onClick={() => onNavigate('login')}
+            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 via-sky-600 to-pink-500 hover:from-sky-600 hover:to-pink-600 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition cursor-pointer flex items-center gap-2"
           >
-            <span>Open as Owner (Alice)</span>
-            <ArrowRight className="h-3.5 w-3.5" />
+            <span>Sign In to Vault</span>
+            <ArrowRight className="h-4 w-4" />
           </button>
 
           <button
-            onClick={() => onSwitchPersona('charlie@trustvault.corp')}
-            className="px-5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+            onClick={() => onNavigate('register')}
+            className="px-6 py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs border border-slate-200 dark:border-slate-700 transition cursor-pointer"
           >
-            View as Colleague (Charlie)
-          </button>
-
-          <button
-            onClick={() => onSwitchPersona('eve@untrusted.org')}
-            className="px-5 py-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 font-semibold text-xs border border-rose-200 dark:border-rose-800 transition cursor-pointer"
-          >
-            Test Blocked Access (Eve)
+            Create New Account
           </button>
         </div>
       </section>
 
-      {/* 3. Essential 3 Pillars Only */}
+      {/* 3. Essential 3 Security Pillars */}
       <section className="py-12 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -138,10 +130,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <KeyRound className="h-5 w-5" />
               </div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                Permissions Per Document
+                Document-Level Permissions
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Give view or edit access only to named people. No shared folder traps where giving access to one file accidentally reveals forty.
+                Grant READ or EDIT access only to specific colleagues by email. Each document is individually governed and verified by the server on every request.
               </p>
             </div>
 
@@ -151,10 +143,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <Lock className="h-5 w-5" />
               </div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                Instant Lockout (0ms)
+                Real-Time Access Revocation
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                When someone leaves or a contract finishes, take access back with one click. Whatever link or token they had stops working immediately.
+                Revoke access immediately in 0 milliseconds. All future preview and download requests are denied on the spot by backend validation.
               </p>
             </div>
 
@@ -164,10 +156,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <History className="h-5 w-5" />
               </div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                Permanent History Proof
+                Cryptographic Audit Ledger
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Every file open, download, and blocked attempt is locked into a tamper-proof SHA-256 ledger that cannot be quietly edited or removed.
+                Every file open, preview, download, and denied access attempt is recorded in a tamper-evident SHA-256 hash-chained audit log.
               </p>
             </div>
           </div>
